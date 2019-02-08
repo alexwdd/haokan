@@ -17,14 +17,20 @@ class Spider():
             'Referer': 'http://sv.baidu.com/',
             'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/72.0.3626.81 Safari/537.36'
         }
-        self.video_dir = os.path.join(os.path.dirname(__file__), 'video')
+        self.log_dir = self.mkdir(os.path.join(os.path.dirname(__file__), 'log'))
+        self.video_dir = self.mkdir(os.path.join(os.path.dirname(__file__), 'video'))
         self.opener = self.build_opener()
         self.logger = self.__build_logger()
 
+    # 创建目录
+    def mkdir(self, dir):
+        if not os.path.isdir(dir):
+            os.mkdir(dir)
+        return dir
+
     # 构建日志输出函数
     def __build_logger(self):
-        dir = os.path.join(os.path.dirname(__file__), 'log')
-        filename = os.path.join(dir, 'spider.log')
+        filename = os.path.join(self.log_dir, 'spider.log')
         logger = logging.getLogger(__name__)
         logger.setLevel(level = logging.INFO)
         handler = logging.FileHandler(filename)
@@ -39,7 +45,7 @@ class Spider():
 
     # 构建带cookie的url opener
     def build_opener(self):
-        cookie_name = 'cookie.log'
+        cookie_name = os.path.join(self.log_dir, 'cookie.log')
         cookie = http.cookiejar.MozillaCookieJar(cookie_name)
         if os.path.isfile(cookie_name):
             cookie.load(cookie_name, ignore_discard=True, ignore_expires=True)
